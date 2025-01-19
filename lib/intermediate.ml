@@ -105,8 +105,6 @@ let%test _ =
   Like the previous problem but in reverse
 *)
 
-(* Creating a new type here since I want to leverage None *)
-
 let encode l =
   let rec map_to_node l aux =
     match l with
@@ -134,4 +132,47 @@ let rec replicate l n =
 
 let%test _ =
   replicate [ "a"; "b"; "c" ] 3 = [ "a"; "a"; "a"; "b"; "b"; "b"; "c"; "c"; "c" ]
+;;
+
+(* drop every nth element of a list *)
+let drop l n =
+  let rec helper l i =
+    match l with
+    | [] -> []
+    | h :: t -> if h mod n = 0 then helper t (i + 1) else h :: helper t (i + 1)
+  in
+  helper l 1
+;;
+
+let%test _ = drop [ 1; 2; 3; 4; 5; 6 ] 3 = [ 1; 2; 4; 5 ]
+
+(* Extract a slice from a list *)
+let slice l i j =
+  let rec helper l aux idx =
+    match l with
+    | [] -> aux
+    | h :: t ->
+      if idx > j
+      then aux
+      else if idx < i
+      then helper t aux (idx + 1)
+      else helper t (h :: aux) (idx + 1)
+  in
+  List.rev (helper l [] 0)
+;;
+
+let%test _ =
+  slice [ "a"; "b"; "c"; "d"; "e"; "f"; "g"; "h"; "i"; "j" ] 2 6
+  = [ "c"; "d"; "e"; "f"; "g" ]
+;;
+
+(* Rotate a list n places to the left *)
+let rotate l n =
+  (* we can drop the first n and put them into another list *)
+  List.drop n l @ List.take n l
+;;
+
+let%test _ =
+  rotate [ "a"; "b"; "c"; "d"; "e"; "f"; "g"; "h" ] 3
+  = [ "d"; "e"; "f"; "g"; "h"; "a"; "b"; "c" ]
 ;;
